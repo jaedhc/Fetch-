@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "75643563153",
+    "project_id": "fetch-773cc",
+    "storage_bucket": "fetch-773cc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:75643563153:android:3540d9ad14681af16da330",
+        "android_client_info": {
+          "package_name": "com.example.fetch"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAeZnDsB5msXXYadW7ZymsVroOW0waeQiI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
