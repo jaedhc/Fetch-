@@ -100,11 +100,11 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnLogin"
+        android:id="@+id/btnSignUp"
         android:layout_width="match_parent"
         android:layout_height="55dp"
         android:backgroundTint="@color/secondaryBg"
-        android:text="LOGIN"
+        android:text="SIGN UP"
         android:textColor="@color/black"
         android:textSize="16sp"
         android:layout_marginBottom="20dp"
