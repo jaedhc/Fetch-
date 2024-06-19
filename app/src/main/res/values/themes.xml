@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
     <style name="Base.Theme.Fetch" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
@@ -9,4 +9,26 @@
     </style>
 
     <style name="Theme.Fetch" parent="Base.Theme.Fetch" />
+
+    <style name="RoundedCornersShape">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">16dp</item> <!-- Adjust the corner size as needed -->
+    </style>
+
+
+    <style name="SimpleInput" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="android:layout_marginTop">10dp</item>
+        <item name="android:layout_height">56dp</item>
+        <item name="boxStrokeColor">@color/black</item>
+        <item name="boxStrokeWidth">1dp</item>
+        <item name="startIconTint">@color/iconColor</item>
+        <item name="shapeAppearanceOverlay">@style/RoundedCornersShape</item>
+        <item name="boxBackgroundColor">@color/white2</item>
+    </style>
+
+    <style name="InputColors">
+        <item name="android:textColorHint">@color/greyBrown</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:paddingStart">50dp</item>
+    </style>
 </resources>
