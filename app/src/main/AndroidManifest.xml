@@ -16,6 +16,9 @@
         android:theme="@style/Theme.Fetch"
         tools:targetApi="31">
         <activity
+            android:name=".UI.view.AddPuppy"
+            android:exported="false" />
+        <activity
             android:name=".UI.view.LogInActivity"
             android:exported="false" />
         <activity
