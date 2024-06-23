@@ -3,6 +3,7 @@ package com.example.fetch.UI.view
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.fetch.R
@@ -25,15 +26,32 @@ class MainActivity : AppCompatActivity() {
             startActivity(i)
             finish()
         }else{
-            binding.btnLogin.setOnClickListener {
-                val i = Intent(this, LogInActivity::class.java)
-                startActivity(i)
-            }
+            init()
+        }
+    }
 
-            binding.btnSignUp.setOnClickListener {
-                val i = Intent(this, SignUpActivity::class.java)
-                startActivity(i)
-            }
+    private fun init(){
+        binding.btnLogin.setOnClickListener {
+            val i = Intent(this, LogInActivity::class.java)
+            startActivity(i)
+            finish()
+        }
+
+        binding.btnSignUp.setOnClickListener {
+            binding.btnLogin.visibility = View.GONE
+            binding.btnSignUp.visibility = View.GONE
+            binding.btnWalker.visibility = View.VISIBLE
+            binding.btnOwner.visibility = View.VISIBLE
+        }
+
+        binding.btnOwner.setOnClickListener {
+            val i = Intent(this, SignUpActivity::class.java)
+            startActivity(i)
+        }
+
+        binding.btnWalker.setOnClickListener {
+            val i = Intent(this, SignUpWalkerActivity::class.java)
+            startActivity(i)
         }
     }
 }

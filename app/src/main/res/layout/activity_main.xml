@@ -85,7 +85,7 @@
         android:textSize="16sp"
         app:cornerRadius="15dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/btnSignUp"
+        app:layout_constraintBottom_toTopOf="@+id/btnWalker"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
