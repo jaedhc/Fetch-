@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.fetch.R
@@ -17,6 +18,7 @@ class LogInActivity : AppCompatActivity() {
     private lateinit var logInViewModel: LogInViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         binding = ActivityLogInBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -35,6 +37,12 @@ class LogInActivity : AppCompatActivity() {
             val email = binding.inputEmail.text.toString()
             val pass = binding.inputPass.text.toString()
             logInViewModel.logIn(email, pass)
+        }
+
+        binding.btnBack.setOnClickListener{
+            val i = Intent(this, MainActivity::class.java)
+            startActivity(i)
+            finish()
         }
     }
 }

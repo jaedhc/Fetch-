@@ -10,7 +10,7 @@
 
 
     <ImageView
-        android:id="@+id/imageView3"
+        android:id="@+id/btnBack"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/icon_back"
@@ -24,7 +24,7 @@
         android:fontFamily="@font/margarine"
         android:text="Fetch!"
         android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView3"
+        app:layout_constraintBottom_toBottomOf="@+id/btnBack"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -35,7 +35,7 @@
         android:src="@drawable/friends"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView3" />
+        app:layout_constraintTop_toBottomOf="@+id/btnBack" />
 
     <TextView
         android:id="@+id/textView2"
@@ -44,6 +44,7 @@
         android:fontFamily="@font/inter"
         android:text="Welcome Back!"
         android:textSize="30sp"
+        android:textColor="@color/black"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/box_pass"
         app:layout_constraintStart_toStartOf="@+id/box_pass"
@@ -56,6 +57,7 @@
         android:fontFamily="@font/inter"
         android:text="Log In to enjoy our app"
         android:textStyle="bold"
+        android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="@+id/textView2"
         app:layout_constraintStart_toStartOf="@+id/textView2"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />
@@ -75,6 +77,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:hint="Email"
+            android:textColor="@color/greyBrown"
+            android:textColorHint="@color/greyBrown"
+            app:hintTextColor="@color/greyBrown"
             android:inputType="textEmailAddress" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -101,15 +106,16 @@
         android:layout_width="match_parent"
         android:layout_height="55dp"
         android:backgroundTint="@color/secondaryBg"
-        android:text="LOG IN"
         android:textColor="@color/black"
         android:textSize="16sp"
-        android:layout_marginBottom="20dp"
+        app:strokeColor="@color/stroke"
+        app:strokeWidth="1dp"
         app:cornerRadius="15dp"
+        android:text="LOG IN"
+        android:layout_marginBottom="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:strokeColor="@color/stroke"
-        app:strokeWidth="1dp" />
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
