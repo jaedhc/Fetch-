@@ -39,7 +39,10 @@ class SignUpActivity : AppCompatActivity() {
             val email = binding.inputEmail.text.toString()
             val pass = binding.inputPass.text.toString()
 
-            signUpViewModel.signUp(name, email, pass)
+            var sharedPreferences = getSharedPreferences("user", MODE_PRIVATE)
+            var walker = sharedPreferences.getBoolean("walker", false)
+
+            signUpViewModel.signUp(name, email, pass, walker)
         }
 
         binding.btnBack.setOnClickListener{

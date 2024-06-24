@@ -20,7 +20,7 @@ class SignUpViewModel: ViewModel() {
 
     var signupState: MutableLiveData<String> = MutableLiveData()
 
-    fun signUp(name: String, email:String, pass:String){
+    fun signUp(name: String, email:String, pass:String, walker:Boolean){
         auth = Firebase.auth
         val db = Firebase.firestore
 
@@ -33,6 +33,7 @@ class SignUpViewModel: ViewModel() {
                         "userId" to auth.currentUser!!.uid,
                         "name" to name,
                         "email" to email,
+                        "isWalker" to walker,
                         "status" to "default",
                         "photoURL" to "https://firebasestorage.googleapis.com/v0/b/cocinapomodoro.appspot.com/o/Users%2Fdefault_pic.jpg?alt=media&token=9d3e04ad-5cf4-4174-bfbd-baacbe4e22fd",
                         "created_at" to System.currentTimeMillis()

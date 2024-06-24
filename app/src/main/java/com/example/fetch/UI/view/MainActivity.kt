@@ -46,11 +46,15 @@ class MainActivity : AppCompatActivity() {
 
         binding.btnOwner.setOnClickListener {
             val i = Intent(this, SignUpActivity::class.java)
+            var sharedPreferences = getSharedPreferences("user", MODE_PRIVATE)
+            sharedPreferences.edit().putBoolean("isWalker", false).apply()
             startActivity(i)
         }
 
         binding.btnWalker.setOnClickListener {
-            val i = Intent(this, SignUpWalkerActivity::class.java)
+            val i = Intent(this, SignUpActivity::class.java)
+            var sharedPreferences = getSharedPreferences("user", MODE_PRIVATE)
+            sharedPreferences.edit().putBoolean("isWalker", true).apply()
             startActivity(i)
         }
     }
