@@ -3,6 +3,7 @@ package com.example.fetch.UI.view
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
@@ -21,24 +22,49 @@ import androidx.core.content.ContextCompat
 import androidx.core.location.LocationManagerCompat.isLocationEnabled
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.fetch.R
+import com.example.fetch.UI.adapter.UserAdapter
+import com.example.fetch.UI.viewmodel.ConnectViewModel
 import com.example.fetch.databinding.ActivityConnectWithWalkerBinding
+import com.example.fetch.domain.MapClickListener
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
-import com.google.android.gms.tasks.CancellationTokenSource
+import com.squareup.moshi.KotlinJsonAdapterFactory
+import com.squareup.moshi.Moshi
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
 import org.osmdroid.config.Configuration
+import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.ItemizedIconOverlay
+import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Polyline
+import java.io.IOException
 import java.util.Locale
 
 class ConnectWithWalkerActivity : AppCompatActivity() {
     private val LOCATION_PERMISSION_REQUEST_CODE = 100
     private lateinit var binding: ActivityConnectWithWalkerBinding
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var connectViewModel: ConnectViewModel
+    private lateinit var userAdapter: UserAdapter
+    private var lastGeoPoint: GeoPoint? = null
+    private var latitude: Double = 0.0
+    private var longitude: Double = 0.0
+    private var lastMarker: Marker? = null
+
+    private lateinit var polyline: Polyline
+    private val client = OkHttpClient()
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -66,7 +92,12 @@ class ConnectWithWalkerActivity : AppCompatActivity() {
                 val location: Location? = locationResult.lastLocation
                 if (location != null) {
                     // Aquí tienes la ubicación del usuario: location.latitude, location.longitude
-                    Toast.makeText(this@ConnectWithWalkerActivity, "Latitud: ${location.latitude}, Longitud: ${location.longitude}", Toast.LENGTH_SHORT).show()
+
+                    if(location.latitude != 0.00 && location.longitude != 0.00){
+                        connectViewModel.changeLocation(location.latitude, location.longitude)
+                        connectViewModel.getUsers(location.latitude, location.longitude)
+                    }
+
                     val geocoder = Geocoder(this@ConnectWithWalkerActivity, Locale.getDefault())
                     val addresses: List<Address> =
                         geocoder.getFromLocation(location.latitude, location.longitude, 1)!!
@@ -83,13 +114,14 @@ class ConnectWithWalkerActivity : AppCompatActivity() {
                         val startMarker = Marker(mapView)
                         startMarker.position = startPoint
                         startMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                        startMarker.title = "Marker in Paris"
                         mapView.overlays.add(startMarker)
                     }
+
+                    latitude = location.latitude
+                    longitude = location.longitude
                 }
             }
         }
-
         fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
 
     }
@@ -131,12 +163,8 @@ class ConnectWithWalkerActivity : AppCompatActivity() {
         binding = ActivityConnectWithWalkerBinding.inflate(layoutInflater)
         enableEdgeToEdge()
         setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
 
+        connectViewModel = ViewModelProvider(this).get(ConnectViewModel::class.java)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         mapView = findViewById(R.id.map)
@@ -144,7 +172,114 @@ class ConnectWithWalkerActivity : AppCompatActivity() {
         mapView.setMultiTouchControls(true)
         solicitarPermisosUbicacion()
 
+        userAdapter = UserAdapter()
+
+        connectViewModel.users.observe(this) { users ->
+
+            userAdapter.setDogList(users)
+
+            binding.rvUsers.apply {
+                adapter = userAdapter
+                layoutManager = LinearLayoutManager(this@ConnectWithWalkerActivity)
+            }
+
+        }
+
+        polyline = Polyline().apply {
+            outlinePaint.color = Color.BLUE
+            outlinePaint.strokeWidth = 8f
+        }
+        mapView.overlays.add(polyline)
+
+        val mapEventsReceiver = object : MapEventsReceiver {
+            override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
+                // This method is called when the map is clicked
+                val latitude = p.latitude
+                val longitude = p.longitude
+
+                if(lastMarker != null){
+                    mapView.overlays.remove(lastMarker)
+                }
+
+                val endMarker = Marker(mapView)
+                endMarker.position = GeoPoint(latitude, longitude)
+                endMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                mapView.overlays.add(endMarker)
+
+                lastGeoPoint = GeoPoint(latitude, longitude)
+                lastMarker = endMarker
+
+                requestRoute(lastGeoPoint!!, GeoPoint(latitude, longitude))
+
+                return true
+            }
+
+            override fun longPressHelper(p: GeoPoint): Boolean {
+                // This method is called when the map is long pressed
+                return false
+            }
+        }
+
+        val eventsOverlay = MapEventsOverlay(mapEventsReceiver)
+        mapView.overlays.add(eventsOverlay)
+
     }
 
 
+
+    private fun requestRoute(startPoint: GeoPoint, endPoint: GeoPoint) {
+        val url = "http://router.project-osrm.org/route/v1/driving/${startPoint.longitude},${startPoint.latitude};${endPoint.longitude},${endPoint.latitude}?overview=full&geometries=geojson"
+
+        val request = Request.Builder().url(url).build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                runOnUiThread {
+                    Toast.makeText(this@ConnectWithWalkerActivity, "Error fetching route: ${e.message}", Toast.LENGTH_SHORT).show()
+                    binding.textView4.text = "No route found ${e.message}"
+                }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (!response.isSuccessful) {
+                    runOnUiThread {
+                        Toast.makeText(this@ConnectWithWalkerActivity, "Error fetching route: ${response.message}", Toast.LENGTH_SHORT).show()
+                    }
+                    return
+                }
+
+                val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+                val adapter = moshi.adapter(OSRMResponse::class.java)
+                val osrmResponse = adapter.fromJson(response.body!!.string())
+
+                runOnUiThread {
+                    if (osrmResponse != null && osrmResponse.routes.isNotEmpty()) {
+                        val route = osrmResponse.routes[0]
+                        val polylinePoints = route.geometry.coordinates.map { coord ->
+                            GeoPoint(coord[1], coord[0])
+                        }
+
+                        // Update the polyline with the route points
+                        polyline.setPoints(polylinePoints)
+                        mapView.invalidate()
+                    } else {
+                        Toast.makeText(this@ConnectWithWalkerActivity, "No route found", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        })
+    }
+
 }
+
+data class OSRMResponse(
+    val routes: List<Route>
+)
+
+data class Route(
+    val geometry: Geometry
+)
+
+data class Geometry(
+    val coordinates: List<List<Double>>
+)
