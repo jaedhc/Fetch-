@@ -57,6 +57,11 @@ class HomeActivity : AppCompatActivity() {
             startActivity(i)
         }
 
+        binding.cardViewAppointments.setOnClickListener {
+            val i = Intent(this, MyAppointments::class.java)
+            startActivity(i)
+        }
+
         homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
 
         homeViewModel.user.observe(this) {
