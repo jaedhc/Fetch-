@@ -16,28 +16,43 @@
 
     <TextView
         android:id="@+id/txtLocation"
-        android:layout_width="250dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="28dp"
         android:fontFamily="@font/inter"
         android:gravity="start"
         android:textStyle="bold"
         android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
         app:layout_goneMarginTop="20dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/map" />
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/txtLocationTo"
+        android:layout_width="match_parent"
         android:layout_marginTop="10dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="20dp"
+        android:fontFamily="@font/inter"
+        android:gravity="start"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtLocation"
+        app:layout_goneMarginTop="20dp" />
+
+    <TextView
+        android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/inter"
+        android:layout_marginTop="10dp"
+        android:text="Select one of our Dog Walkers"
         android:textSize="20dp"
-        android:text="Dog Walkers Near You"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="@+id/txtLocation"
-        app:layout_constraintTop_toBottomOf="@+id/txtLocation" />
+        app:layout_constraintTop_toBottomOf="@+id/txtLocationTo" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvUsers"

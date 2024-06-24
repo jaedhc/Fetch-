@@ -7,28 +7,20 @@ import android.graphics.Color
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
-import android.location.LocationRequest
 import android.os.Bundle
 import android.os.Looper
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.motion.widget.Debug.getLocation
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.location.LocationManagerCompat.isLocationEnabled
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.fetch.R
 import com.example.fetch.UI.adapter.UserAdapter
 import com.example.fetch.UI.viewmodel.ConnectViewModel
+import com.example.fetch.data.model.User
 import com.example.fetch.databinding.ActivityConnectWithWalkerBinding
-import com.example.fetch.domain.MapClickListener
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationResult
@@ -45,7 +37,6 @@ import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
-import org.osmdroid.views.overlay.ItemizedIconOverlay
 import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.Polyline
@@ -104,7 +95,7 @@ class ConnectWithWalkerActivity : AppCompatActivity() {
                     if (addresses.isNotEmpty()) {
                         val address = addresses[0]
                         val direccion = address.getAddressLine(0)
-                        binding.txtLocation.text = direccion
+                        binding.txtLocation.text = "From: $direccion"
 
                         //Inicializar mapa
                         val startPoint = GeoPoint(location.latitude, location.longitude)
@@ -185,6 +176,17 @@ class ConnectWithWalkerActivity : AppCompatActivity() {
 
         }
 
+        userAdapter.setOnUserClickListener(object: UserAdapter.OnUserClickListener{
+            override fun onUserSelected(position: Int, user: List<User>) {
+                connectViewModel.schedule(
+                    GeoPoint(latitude, longitude),
+                    lastGeoPoint!!,
+                    binding.txtLocation.text.toString(),
+                    binding.txtLocationTo.text.toString(),
+                    user[position].id)
+            }
+        })
+
         polyline = Polyline().apply {
             outlinePaint.color = Color.BLUE
             outlinePaint.strokeWidth = 8f
@@ -211,6 +213,17 @@ class ConnectWithWalkerActivity : AppCompatActivity() {
 
                 requestRoute(lastGeoPoint!!, GeoPoint(latitude, longitude))
 
+                val geocoder = Geocoder(this@ConnectWithWalkerActivity, Locale.getDefault())
+                val addresses: List<Address> =
+                    geocoder.getFromLocation(latitude, longitude, 1)!!
+
+                if (addresses.isNotEmpty()) {
+                    val address = addresses[0]
+                    val direccion = address.getAddressLine(0)
+                    binding.txtLocationTo.text = "To: $direccion"
+
+                }
+
                 return true
             }
 
@@ -224,8 +237,6 @@ class ConnectWithWalkerActivity : AppCompatActivity() {
         mapView.overlays.add(eventsOverlay)
 
     }
-
-
 
     private fun requestRoute(startPoint: GeoPoint, endPoint: GeoPoint) {
         val url = "http://router.project-osrm.org/route/v1/driving/${startPoint.longitude},${startPoint.latitude};${endPoint.longitude},${endPoint.latitude}?overview=full&geometries=geojson"

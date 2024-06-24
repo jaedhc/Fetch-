@@ -26,6 +26,10 @@ class UserAdapter: RecyclerView.Adapter<UserHolder>() {
     override fun onBindViewHolder(holder: UserHolder, position: Int) {
         val element = listOfUsers[position]
 
+        holder.itemView.setOnClickListener {
+            listener?.onUserSelected(position, listOfUsers)
+        }
+
         holder.txtName.text = element.name
         holder.txtBreed.text = element.email
         Glide.with(holder.itemView.context).load(element.imageUrl).circleCrop().into(holder.imgDog)
@@ -36,14 +40,14 @@ class UserAdapter: RecyclerView.Adapter<UserHolder>() {
         notifyDataSetChanged()
     }
 
-    fun onUserClickListener(listener: OnUserClickListener){
+    fun setOnUserClickListener(listener: OnUserClickListener){
         this.listener = listener
     }
 
-}
+    interface OnUserClickListener {
+        fun onUserSelected(position: Int, user: List<User>)
+    }
 
-interface OnUserClickListener {
-    fun onDogSelected(position: Int, dogs: List<Dog>)
 }
 
 class UserHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
